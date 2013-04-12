@@ -23,15 +23,16 @@ for example if your program outputs
 
 testutil output is going to be
 
->runningtime      iter
->10               5
->20               10
->12               6
+	runningtime     iter
+	10              5
+	20              10
+	2               6
 
-options:
--h help
--m cmd - takes indices from paramter ex. -m "seq 5 10"
--l     - adds a "label" # to the results with the indices of the calls
--p     - uses the indices as the last paramater of cmd
--n     - same as -m "seq 1 n", executes n times
+	options:
+	-h help
+
+	-m cmd - takes indices from paramter ex. -m "seq 5 10"
+	-l     - adds a "label" # to the results with the indices of the calls
+	-p     - uses the indices as the last paramater of cmd
+	-n     - same as -m "seq 1 n", executes n times
  

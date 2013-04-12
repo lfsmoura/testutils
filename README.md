@@ -15,12 +15,15 @@ Utils
 > for example if your program outputs
 
 	runningtime:10s
+	iter:5
 	runningtime:20s
+	iter:10
 	runningtime:12s
+	iter:6
 
 > testutil output is going to be
 
-	runningtime
-	10
-	20
-	12
+	runningtime	iter
+	10		5
+	20		10
+	12		6

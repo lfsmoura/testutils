@@ -4,6 +4,7 @@ n=1
 
 while [ "$1" ]
 do
+  echo $1
   case $1 in
     "-h"|"--help")
       echo "./testeutil [OPTIONS] 'cmd'"
@@ -15,16 +16,28 @@ do
       shift
       n=$1
     ;;
+  "-p")
+      use_n_as_parameter="true"
+  ;;
+  "-m")
+      shift
+      fun=$1
+  ;;
     *) 
       cmd1=$1
     ;;
   esac
   shift
 done
+
+if [ -z "$fun" ]; then  fun="seq 1 $n"; fi
+
 touch $$temp
-for i in $(seq 1 $n)
+for i in $($fun)
 do
-  $cmd1 >> $$temp
+    cmd=$cmd1
+    if [ "$use_n_as_parameter" ]; then cmd=$cmd" "$i; fi
+  $cmd >> $$temp
 done
 
 cat $$temp |
@@ -36,6 +49,7 @@ awk -F ":" '
       fieldNames[fields]=$1
       fields += 1;
     }
+    gsub(/[ \t]/, "", $2);
     values[$1, count[$1]] = $2;
     count[$1] += 1;
     if(count[$1] > maxcount)

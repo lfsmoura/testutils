@@ -2,19 +2,17 @@
 
 n=1
 
-while getopts "nm:lph" opt
+while getopts "n:m:lph" opt
 do
-  echo $opt
   case $opt in
   n)
       n=$OPTARG
-      echo $OPTARG " = n"
     ;;
   p)
       use_n_as_parameter="true"
   ;;
   m)
-    echo $OPTARG
+    fun=$OPTARG
   ;;
   l)
     label_with_n="true"
@@ -31,14 +29,16 @@ do
     echo "-l     - adds a "label" # to the results with the indices of the calls"
     echo "-p     - uses the indices as the last paramater of cmd"
     echo "-n     - same as -m "seq 1 n", executes n times"
-    echo "ex: ./testeutil -lpn 10 'echo test:'"
+    echo "ex: ./testutil -lpn 10 echo test:"
+    echo "ex: ./testutil -lpm 'seq 10 10 100' echo test:"
     exit 1
   ;;
   esac
 done
 
+
 shift $((OPTIND-1))
-cmd1=$1
+cmd1=$@
 
 if [ -z "$fun" ]; then  fun="seq 1 $n"; fi
 

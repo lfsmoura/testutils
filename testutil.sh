@@ -2,7 +2,7 @@
 
 n=1
 
-while getopts "n:m:lph" opt
+while getopts "n:m:lphv" opt
 do
   case $opt in
   n)
@@ -16,7 +16,9 @@ do
   ;;
   l)
     label_with_n="true"
-    echo "label"
+  ;;
+  v)
+    verbose="true"
   ;;
   :)  
     echo "Option -$OPTARG requires an argument." >&2
@@ -48,6 +50,7 @@ do
   cmd=$cmd1
   if [ "$label_with_n" ]; then echo "#:$i" >> $$temp; fi
   if [ "$use_n_as_parameter" ]; then cmd=$cmd" "$i; fi
+  if [ "$verbose" ]; then echo $cmd; fi
   $cmd >> $$temp
 done
 

@@ -24,11 +24,12 @@ for example if your program outputs
 testutil output is going to be
 
 	runningtime     iter
-	10              5
-	20              10
-	2               6
+	10s             5
+	20s             10
+	2s              6
 
-	options:
+options:
+
 	-h help
 
 	-m cmd - takes indices from paramter ex. -m "seq 5 10"

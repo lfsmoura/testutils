@@ -2,27 +2,37 @@
 
 n=1
 
-while getopts nm:lph opt
+while getopts "nm:lph" opt
 do
+  echo $opt
   case $opt in
-    h|[?]|help)
-      echo "./testeutil [OPTIONS] 'cmd'"
-      echo " -n repeat cmd n times "
-      echo "ex: ./testeutil -n 10 'echo test:1'"
-      exit
-    ;;
   n)
       n=$OPTARG
+      echo $OPTARG " = n"
     ;;
   p)
       use_n_as_parameter="true"
   ;;
   m)
     echo $OPTARG
-      fun=$OPTARG
   ;;
   l)
     label_with_n="true"
+    echo "label"
+  ;;
+  :)  
+    echo "Option -$OPTARG requires an argument." >&2
+    exit 1
+  ;;
+  h|[?]|help)
+    echo "./testeutil [OPTIONS] 'cmd'"
+    echo "-h help"
+    echo "-m cmd - takes indices from paramter ex. -m 'seq 5 10'"
+    echo "-l     - adds a "label" # to the results with the indices of the calls"
+    echo "-p     - uses the indices as the last paramater of cmd"
+    echo "-n     - same as -m "seq 1 n", executes n times"
+    echo "ex: ./testeutil -lpn 10 'echo test:'"
+    exit 1
   ;;
   esac
 done

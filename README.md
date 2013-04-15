@@ -31,8 +31,7 @@ testutil output is going to be
 options:
 
 	-h help
-
-	-m cmd - takes indices from paramter ex. -m "seq 5 10"
+	-m inputs - instead of using number as inputs, use $inputs"
 	-l     - adds a "label" # to the results with the indices of the calls
 	-p     - uses the indices as the last paramater of cmd
 	-n     - same as -m "seq 1 n", executes n times

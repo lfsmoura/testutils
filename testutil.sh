@@ -1,9 +1,16 @@
 #!/bin/bash
 
 n=1
-
-while getopts "n:m:lphv" opt
+some_options=""
+use_n_as_paramter=""
+verbose=""
+latex_mode=""
+label_with_n=""
+inputs=""
+OPTIND=1
+while getopts "n:m:lphvx" opt
 do
+  some_options="true"
   case $opt in
   n)
       n=$OPTARG
@@ -19,6 +26,9 @@ do
   ;;
   v)
     verbose="true"
+  ;;
+  x)
+    latex_mode="true"
   ;;
   :)  
     echo "Option -$OPTARG requires an argument." >&2
@@ -38,8 +48,8 @@ do
   esac
 done
 
+if [ $OPTIND > 1 ]; then shift $((OPTIND-1)); fi
 
-shift $((OPTIND-1))
 cmd1=$@
 
 if [ -z "$inputs" ]; then  inputs=`seq 1 $n`; fi
@@ -55,8 +65,14 @@ do
 done
 
 cat $$temp |
-awk -F ":" '
-  BEGIN{ fields=0; maxcount=0}
+awk -F ":" -v latex_mode=$latex_mode '
+  BEGIN{ 
+    fields=0; maxcount=0;
+    if(latex_mode){
+      separator="&";
+      lseparator = "\\\\";
+    }
+  }
   NF>1 {
     if(count[$1] == 0) {
       count[$1] = 0;
@@ -70,16 +86,29 @@ awk -F ":" '
       maxcount = count[$1];
   }
   END{
-    for(i = 0; i < fields-1; i++)
-      printf("%s \t", fieldNames[i]); 
-    printf("%s \n", fieldNames[fields-1]);
+    if(latex_mode){
+      print "\\begin{tabular}{*{" fields "}{c}}"
+      print "\\hline"
+    }
 
-    
+    for(i = 0; i < fields-1; i++)
+      printf("%s %s \t ", fieldNames[i], separator); 
+    printf("%s %s \n", fieldNames[fields-1], lseparator);
+
+    if(latex_mode)
+      print "\\hline"
+
     for(i = 0; i < maxcount; i++) {
       for(j = 0; j < fields; j++)
-        printf("%s\t", values[fieldNames[j], i]);
-      print ""
+        if(j < fields -1)
+          printf("%s %s\t", values[fieldNames[j], i], separator);
+        else
+          print values[fieldNames[j], i] " " lseparator;
     }
-  }
-' | column -t 
+
+    if(latex_mode){
+      print "\\hline";
+      print "\\end{tabular}";
+    }
+  }' | column -t
 rm $$temp

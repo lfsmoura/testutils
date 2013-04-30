@@ -58,52 +58,81 @@ touch $$temp
 for i in $inputs
 do
   cmd=$cmd1
-  if [ "$label_with_n" ]; then echo "#:$i" >> $$temp; fi
   if [ "$use_n_as_parameter" ]; then cmd=$cmd" "$i; fi
   if [ "$verbose" ]; then echo $cmd; fi
-  $cmd >> $$temp
+
+  if [ "$label_with_n" ]; 
+  then 
+    $cmd | awk -v n=$i ' /:/ { print $0":"n }' >> $$temp
+  else
+    $cmd >> $$temp
+  fi
 done
 
 cat $$temp |
 awk -F ":" -v latex_mode=$latex_mode '
   BEGIN{ 
-    fields=0; maxcount=0;
+    maxcount=0;
     if(latex_mode){
       separator="&";
       lseparator = "\\\\";
     }
   }
   NF>1 {
-    if(count[$1] == 0) {
-      count[$1] = 0;
-      fieldNames[fields]=$1
-      fields += 1;
-    }
     gsub(/[ \t]/, "", $2);
-    values[$1, count[$1]] = $2;
-    count[$1] += 1;
-    if(count[$1] > maxcount)
-      maxcount = count[$1];
+    fields[$1] = $1;
+    if($3) {
+      id = $3
+    } else {
+      id = ++count[$1];
+    }
+    ids[id] = id;
+    values[$1, id, ++count[$1, id]] = $2;
+  }
+  function mean(field, id) {
+    c = count[field,id]
+    sum = 0;
+    for(i=1;  i<=c;  i++) {
+      sum += values[field, id, i];
+    }
+    return sum / c;
+  }
+  function sdev(field, id) {
+    c = count[field,id];
+    sumsq = 0;
+    for(i=1; i<=c; i++){
+      val = values[field, id, i];
+      sumsq += val*val;
+    }
+    meanv = mean(field,id);
+    return sqrt((sumsq/c) - (meanv * meanv));
   }
   END{
     if(latex_mode){
-      print "\\begin{tabular}{*{" fields "}{c}}"
+      nfields = split($a, fields);
+      print "\\begin{tabular}{*{" nfields + 1 "}{c}}"
       print "\\hline"
     }
 
-    for(i = 0; i < fields-1; i++)
-      printf("%s %s \t ", fieldNames[i], separator); 
-    printf("%s %s \n", fieldNames[fields-1], lseparator);
+    printf("#");
+    for(field in fields)
+      printf("\t %s %s", field, separator); 
+    printf("%s\n", lseparator);
 
     if(latex_mode)
       print "\\hline"
 
-    for(i = 0; i < maxcount; i++) {
-      for(j = 0; j < fields; j++)
-        if(j < fields -1)
-          printf("%s %s\t", values[fieldNames[j], i], separator);
+    for(id in ids) {
+      printf("%s \t", id);
+      for(field in fields){
+        if(!count[field,id])
+          printf("- %s", separator);
+        else if(count[field,id] > 1)
+          printf("%.3f±%.3f %s" , mean(field,id), sdev(field, id), separator);
         else
-          print values[fieldNames[j], i] " " lseparator;
+          printf("%s %s\t", values[field, id, 1], separator);
+      }
+      print ""
     }
 
     if(latex_mode){

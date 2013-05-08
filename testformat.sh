@@ -1,32 +1,9 @@
 #!/bin/bash
 
-n=1
-some_options=""
-use_n_as_paramter=""
-verbose=""
 latex_mode=""
-label_with_n=""
-inputs=""
-OPTIND=1
-while getopts "n:m:lphvx" opt
+while getopts "xh" opt
 do
-  some_options="true"
   case $opt in
-  n)
-      n=$OPTARG
-    ;;
-  p)
-      use_n_as_parameter="true"
-  ;;
-  m)
-    inputs=$OPTARG
-  ;;
-  l)
-    label_with_n="true"
-  ;;
-  v)
-    verbose="true"
-  ;;
   x)
     latex_mode="true"
   ;;
@@ -50,26 +27,6 @@ done
 
 if [ $OPTIND > 1 ]; then shift $((OPTIND-1)); fi
 
-cmd1=$@
-
-if [ -z "$inputs" ]; then  inputs=`seq 1 $n`; fi
-
-touch $$temp
-for i in $inputs
-do
-  cmd=$cmd1
-  if [ "$use_n_as_parameter" ]; then cmd=$cmd" "$i; fi
-  if [ "$verbose" ]; then echo $cmd; fi
-
-  if [ "$label_with_n" ]; 
-  then 
-    $cmd | awk -v n=$i ' /:/ { print $0":"n }' >> $$temp
-  else
-    $cmd >> $$temp
-  fi
-done
-
-cat $$temp |
 awk -F ":" -v latex_mode=$latex_mode '
   BEGIN{ 
     maxcount=0;
@@ -129,7 +86,7 @@ awk -F ":" -v latex_mode=$latex_mode '
         if(!count[field,id])
           printf("%s - ", separator);
         else if(count[field,id] > 1)
-          printf("%s %.3f±%.3f(%d)" , separator, mean(field,id), sdev(field, id), count[field,id]);
+          printf("%s %.3f±%.3f(%d) " , separator, mean(field,id), sdev(field, id), count[field,id]);
         else
           printf("%s %s\t", separator, values[field, id, 1]);
       }
@@ -140,5 +97,8 @@ awk -F ":" -v latex_mode=$latex_mode '
       print "\\hline";
       print "\\end{tabular}";
     }
-  }' | column -t
-rm $$temp
+  }' |
+if [ "true" ]
+then
+  column -t
+fi

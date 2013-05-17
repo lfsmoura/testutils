@@ -44,7 +44,7 @@ if [ -z "$inputs" ]; then  inputs=`seq 1 $n`; fi
 for i in $inputs
 do
   cmd="$@ $i"
-  if [ "$verbose" ]; then echo $cmd; fi
+  if [ "$verbose" ]; then echo $cmd | sed 's/\:/\.\./g'; fi
 
   if [ "$label_with_n" ]; 
   then 

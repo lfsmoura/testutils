@@ -27,7 +27,7 @@ done
 
 if [ $OPTIND > 1 ]; then shift $((OPTIND-1)); fi
 
-awk -F ":" -v latex_mode=$latex_mode '
+gawk -F ":" -v latex_mode=$latex_mode '
   BEGIN{ 
     maxcount=0;
     if(latex_mode){

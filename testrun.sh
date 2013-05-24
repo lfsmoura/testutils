@@ -37,7 +37,7 @@ do
   esac
 done
 
-if [ $OPTIND > 1 ]; then shift $((OPTIND-1)); fi
+if [ $OPTIND -gt 1 ]; then shift $(( OPTIND - 1 )); fi
 
 if [ -z "$inputs" ]; then  inputs=`seq 1 $n`; fi
 

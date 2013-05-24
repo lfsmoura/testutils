@@ -25,7 +25,7 @@ do
   esac
 done
 
-if [ $OPTIND > 1 ]; then shift $((OPTIND-1)); fi
+if [ $OPTIND -gt 1 ]; then shift $(( OPTIND - 1 )); fi
 
 gawk -F ":" -v latex_mode=$latex_mode '
   BEGIN{ 

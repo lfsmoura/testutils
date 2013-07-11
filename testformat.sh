@@ -1,9 +1,13 @@
 #!/bin/bash
 
 latex_mode=""
-while getopts "xh" opt
+tformat_index_label="#"
+while getopts "i:xh" opt
 do
   case $opt in
+  i)
+    tformat_index_label=$OPTARG
+  ;;
   x)
     latex_mode="true"
   ;;
@@ -12,22 +16,19 @@ do
     exit
   ;;
   h|[?]|help)
-    echo "./testeutil [OPTIONS] 'cmd'"
-    echo "-h help"
-    echo "-m inputs - instead of using number as inputs, use \$inputs"
-    echo "-l     - adds a "label" # to the results with the indices of the calls"
-    echo "-p     - uses the indices as the last paramater of cmd"
-    echo "-n     - same as -m \'seq 1 n\', executes n times"
-    echo "ex: ./testutil -lpn 10 echo test:"
-    echo "ex: ./testutil -lpm '\`seq 10 10 100\`' echo test:"
+    echo "tformat [OPTIONS] 'cmd'"
+    echo -e "option\tparam\t\teffect"
+    echo -e "-h\t\t\thelp"
+    echo -e "-x\t\t\tlatex mode" 
+    echo -e "-i\tindex_label\tlabel for the index"
     exit
   ;;
   esac
 done
 
-if [ $OPTIND -gt 1 ]; then shift $(( OPTIND - 1 )); fi
+if [ $OPTIND -gt "1" ]; then shift $(( OPTIND - 1 )); fi
 
-gawk -F ":" -v latex_mode=$latex_mode '
+gawk -F ":" -v label=$tformat_index_label -v latex_mode=$latex_mode '
   BEGIN{ 
     maxcount=0;
     if(latex_mode){
@@ -72,7 +73,7 @@ gawk -F ":" -v latex_mode=$latex_mode '
       print "\\hline"
     }
 
-    printf("#");
+    printf("%s", label);
     for(field in fields)
       printf("\t %s %s", separator, field); 
     printf(" %s \n", lseparator);

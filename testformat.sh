@@ -1,7 +1,7 @@
 #!/bin/bash
 
 latex_mode=""
-tformat_index_label="#"
+tformat_index_label=""
 while getopts "i:xh" opt
 do
   case $opt in

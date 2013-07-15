@@ -1,3 +1,4 @@
 #!/bin/bash
-cp testrun.sh /bin/trun
-cp testformat.sh /bin/tformat
+cp testrun.sh /usr/local/bin/trun
+cp testformat.sh /usr/local/bin/tformat
+cp suffix.sh /usr/local/bin/suffix

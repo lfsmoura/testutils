@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./testformat.py $@ | column -t
+testformat.py $@ | column -t

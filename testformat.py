@@ -45,7 +45,8 @@ def get_value(file, field):
       return "{0:.2f}".format(numpy.mean(map(float, values), axis=0))
     else:
       return '%.2f+-' % numpy.mean(map(float, values), axis=0) + \
-          '%.2f' % numpy.std(map(float, values), axis=0)
+          '%.2f' % numpy.std(map(float, values), axis=0) + \
+          '(%d)' % len(values)
   else:
     return '-'
 

@@ -1,4 +1,4 @@
 #!/bin/bash
-cp testrun.sh /bin/trun
-cp testformat.sh /bin/tformat
-cp testformat.py /bin/testformat.py
+cp testrun.sh /usr/local/bin/trun
+cp testformat.sh /usr/local/bin/tformat
+cp testformat.py /usr/local/bin/testformat.py

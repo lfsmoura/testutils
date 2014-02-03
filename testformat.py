@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser(description="format test results.")
 parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.0.0')
 parser.add_argument('--sum', nargs='*', help='named fields are summed')
 parser.add_argument('--mean', nargs='*', help='mean of named fields is shown')
+parser.add_argument('--meanstddev', nargs='*', help='mean +- std deviation of named fields is shown')
 parser.add_argument('--latex', action='store_true', help='prints in latex format')
 args = parser.parse_args()
 
@@ -35,6 +36,7 @@ def add_value(filename, field, value):
   files[filename][field].append(value)
 
 def get_value(file, field):
+  global ML
   values = file.get(field)
   if values:
     if len(values) == 1:
@@ -43,8 +45,11 @@ def get_value(file, field):
       return "{0:.2f}".format(sum(map(float, values)))
     elif args.mean and field in args.mean:
       return "{0:.2f}".format(numpy.mean(map(float, values), axis=0))
+    elif args.meanstddev and field in args.meanstddev:
+      return '%.2f' % numpy.mean(map(float, values), axis=0) + ML + \
+          '%.2f' % numpy.std(map(float, values), axis=0)
     else:
-      return '%.2f+-' % numpy.mean(map(float, values), axis=0) + \
+      return '%.2f' % numpy.mean(map(float, values), axis=0) + ML + \
           '%.2f' % numpy.std(map(float, values), axis=0) + \
           '(%d)' % len(values)
   else:
@@ -62,11 +67,13 @@ for line in fileinput.input('-'):
 HS = "\n"
 FS = "\t"
 LS = "\n"
+ML = "+-"
 
 if args.latex:
   HS = "\\ \n \\hline \n"
   FS = "\t & "
   LS = "\\\\ \n"
+  ML = "\pm"
 
 print "#",
 for field in fields:

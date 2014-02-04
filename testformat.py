@@ -73,7 +73,7 @@ if args.latex:
   HS = "\\ \n \\hline \n"
   FS = "\t & "
   LS = "\\\\ \n"
-  ML = "\pm"
+  ML = "$\pm$"
 
 print "#",
 for field in fields:

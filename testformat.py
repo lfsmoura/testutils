@@ -9,6 +9,7 @@ from sets import Set
 import argparse
 
 parser = argparse.ArgumentParser(description="format test results.")
+parser.add_argument('-a', '--all', action='store_true', help='print all fields')
 parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.0.0')
 parser.add_argument('--sum', nargs='*', help='named fields are summed')
 parser.add_argument('--mean', nargs='*', help='mean of named fields is shown')
@@ -21,14 +22,23 @@ files = defaultdict(dict)
 unlabeled = defaultdict(list)
 maxlen = 0
 
+def  inargs(field, args):
+  return args and field in args
+
 def add_unlabeled_value(field, value):
-  global maxlen, unlabeled, fields
+  global maxlen, unlabeled, fields, args
+  if not args.all and not inargs(field, args.sum) and not inargs(field, args.mean) and \
+      not inargs(field, args.meanstddev):
+    return
   fields.add(field)
   unlabeled[field].append(value)
   maxlen = max(maxlen, len(unlabeled[field]))
 
 def add_value(filename, field, value):
-  global files, fields
+  global files, fields, args
+  if not args.all and not inargs(field, args.sum) and not inargs(field, args.mean) and \
+      not inargs(field, args.meanstddev):
+    return
   fields.add(field)
   if not field in files[filename]:
     files[filename][field] = []

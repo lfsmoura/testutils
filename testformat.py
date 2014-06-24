@@ -15,10 +15,12 @@ parser.add_argument('--sum', nargs='*', help='named fields are summed')
 parser.add_argument('--mean', nargs='*', help='mean of named fields is shown')
 parser.add_argument('--meanstddev', nargs='*', help='mean +- std deviation of named fields is shown')
 parser.add_argument('--latex', action='store_true', help='prints in latex format')
+parser.add_argument('--max', action='store_true', help='outline the maximum value')
+parser.add_argument('--min', action='store_true', help='outline the minimum value')
 args = parser.parse_args()
 
 fields = Set()
-files = defaultdict(dict)
+labels = defaultdict(dict)
 unlabeled = defaultdict(list)
 maxlen = 0
 
@@ -35,15 +37,15 @@ def add_unlabeled_value(field, value):
   maxlen = max(maxlen, len(unlabeled[field]))
 
 def add_value(filename, field, value):
-  global files, fields, args
+  global labels, fields, args
   if not args.all and not inargs(field, args.sum) and not inargs(field, args.mean) and \
       not inargs(field, args.meanstddev):
     return
   fields.add(field)
-  if not field in files[filename]:
-    files[filename][field] = []
+  if not field in labels[filename]:
+    labels[filename][field] = []
 
-  files[filename][field].append(value)
+  labels[filename][field].append(value)
 
 def get_value(file, field):
   global ML
@@ -59,8 +61,7 @@ def get_value(file, field):
       return '%.2f' % numpy.mean(map(float, values), axis=0) + ML + \
           '%.2f' % numpy.std(map(float, values), axis=0)
     else:
-      return '%.2f' % numpy.mean(map(float, values), axis=0) + ML + \
-          '%.2f' % numpy.std(map(float, values), axis=0) + \
+      return "{0:.2f}".format(numpy.mean(map(float, values), axis=0)) + \
           '(%d)' % len(values)
   else:
     return '-'
@@ -78,6 +79,7 @@ HS = "\n"
 FS = "\t"
 LS = "\n"
 ML = "+-"
+NA = "-"
 
 if args.latex:
   HS = "\\ \n \\hline \n"
@@ -85,22 +87,34 @@ if args.latex:
   LS = "\\\\ \n"
   ML = "$\pm$"
 
+# print headers
 print "#",
 for field in fields:
   print FS, field,
 
 print HS,
 
-for id in (range(maxlen) + files.keys()):
+# print data
+for id in (range(maxlen) + labels.keys()):
   print id,
-  file = files.get(id)
+  label = labels.get(id)
+  line = {}
   for field in fields:
-    if file:
-      print FS, get_value(file, field),
+    if label:
+      #print FS, 
+      line[field] = get_value(label, field)
     else:
       if field in unlabeled and len(unlabeled[field]) > id:
-        print FS, unlabeled[field][id],
+        line[field] = unlabeled[field][id]
       else:
-        print FS, "-",
+        line[field] = NA
+ 
+  if args.max:
+    pass
+  elif args.min:
+    pass
+
+  for field in fields:
+    print FS, line[field],
   print LS,
 

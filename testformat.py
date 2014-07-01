@@ -80,12 +80,16 @@ FS = "\t"
 LS = "\n"
 ML = "+-"
 NA = "-"
+BO = "<"
+BE = ">"
 
 if args.latex:
   HS = "\\ \n \\hline \n"
   FS = "\t & "
   LS = "\\\\ \n"
   ML = "$\pm$"
+  BO = "{\\bf"
+  BE = "}"
 
 # print headers
 print "#",
@@ -99,22 +103,33 @@ for id in (range(maxlen) + labels.keys()):
   print id,
   label = labels.get(id)
   line = {}
+
+  bestFound = False
+  best = -1
   for field in fields:
     if label:
       #print FS, 
       line[field] = get_value(label, field)
+      try:
+        if args.max and (not bestFound or float(line[field]) > best):
+          best, bestFound = float(line[field]), True
+        elif args.min and (not bestFound or float(line[field]) < best):
+          best, bestFound = float(line[field]), True
+      except:
+        pass
     else:
       if field in unlabeled and len(unlabeled[field]) > id:
         line[field] = unlabeled[field][id]
       else:
         line[field] = NA
  
-  if args.max:
-    pass
-  elif args.min:
-    pass
-
   for field in fields:
-    print FS, line[field],
+    try:
+      if bestFound and float(line[field]):
+        print FS, BO, line[field], BE, 
+      else:
+        print FS, line[field],
+    except:
+      print FS, line[field],
   print LS,
 

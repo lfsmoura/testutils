@@ -10,7 +10,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description="format test results.")
 parser.add_argument('-a', '--all', action='store_true', help='print all fields')
-parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.0.0')
+parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.1.0')
 parser.add_argument('--sum', nargs='*', help='named fields are summed')
 parser.add_argument('--mean', nargs='*', help='mean of named fields is shown')
 parser.add_argument('--meanstddev', nargs='*', help='mean +- std deviation of named fields is shown')
@@ -75,6 +75,8 @@ for line in fileinput.input('-'):
   elif len(fline) == 3:
     add_value(fline[2], fline[0], fline[1])
 
+B_TABLE = None
+E_TABLE = None
 HS = "\n"
 FS = "\t"
 LS = "\n"
@@ -84,6 +86,9 @@ BO = "<"
 BE = ">"
 
 if args.latex:
+  B_TABLE = "\\n begin{tabular} { %s }" % \
+      ("l " + str.join(" ", ["r" for x in range(len(fields))]))
+  E_TABLE = "\\end{tabular}"
   HS = "\t \\\\ \n \\hline \n"
   FS = "\t & "
   LS = "\t \\\\ \n"
@@ -92,6 +97,9 @@ if args.latex:
   BE = "}"
 
 # print headers
+if B_TABLE:
+  print B_TABLE
+
 print "#",
 for field in fields:
   print FS, field.strip(),
@@ -104,17 +112,16 @@ for id in (range(maxlen) + labels.keys()):
   label = labels.get(id)
   line = {}
 
-  bestFound = False
-  best = -1
+  best = None
   for field in fields:
     if label:
       #print FS, 
       line[field] = get_value(label, field)
       try:
-        if args.max and (not bestFound or float(line[field]) > best):
-          best, bestFound = float(line[field]), True
-        elif args.min and (not bestFound or float(line[field]) < best):
-          best, bestFound = float(line[field]), True
+        if args.max and (not best or float(line[field]) > best):
+          best = float(line[field])
+        elif args.min and (not best or float(line[field]) < best):
+          best = float(line[field])
       except:
         pass
     else:
@@ -125,11 +132,14 @@ for id in (range(maxlen) + labels.keys()):
  
   for field in fields:
     try:
-      if bestFound and float(line[field]) == best:
+      if best and float(line[field]) == best:
         print FS, "%s%s%s" % (BO, line[field].strip(), BE), 
       else:
         print FS, line[field].strip(),
     except:
       print FS, line[field].strip(),
   print LS,
+
+if E_TABLE:
+  print E_TABLE
 

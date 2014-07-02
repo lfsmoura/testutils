@@ -94,7 +94,7 @@ if args.latex:
 # print headers
 print "#",
 for field in fields:
-  print FS, field,
+  print FS, field.strip(),
 
 print HS,
 
@@ -128,8 +128,8 @@ for id in (range(maxlen) + labels.keys()):
       if bestFound and float(line[field]) == best:
         print FS, "%s%s%s" % (BO, line[field].strip(), BE), 
       else:
-        print FS, line[field],
+        print FS, line[field].strip(),
     except:
-      print FS, line[field],
+      print FS, line[field].strip(),
   print LS,
 

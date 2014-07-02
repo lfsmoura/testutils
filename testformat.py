@@ -84,9 +84,9 @@ BO = "<"
 BE = ">"
 
 if args.latex:
-  HS = "\\ \n \\hline \n"
+  HS = "\t \\\\ \n \\hline \n"
   FS = "\t & "
-  LS = "\\\\ \n"
+  LS = "\t \\\\ \n"
   ML = "$\pm$"
   BO = "{\\bf "
   BE = "}"
@@ -125,8 +125,8 @@ for id in (range(maxlen) + labels.keys()):
  
   for field in fields:
     try:
-      if bestFound and float(line[field]):
-        print FS, "%s%s%s" % (BO, line[field], BE), 
+      if bestFound and float(line[field]) == best:
+        print FS, "%s%s%s" % (BO, line[field].strip(), BE), 
       else:
         print FS, line[field],
     except:

@@ -88,7 +88,7 @@ if args.latex:
   FS = "\t & "
   LS = "\\\\ \n"
   ML = "$\pm$"
-  BO = "{\\bf"
+  BO = "{\\bf "
   BE = "}"
 
 # print headers
@@ -126,7 +126,7 @@ for id in (range(maxlen) + labels.keys()):
   for field in fields:
     try:
       if bestFound and float(line[field]):
-        print FS, BO, line[field], BE, 
+        print FS, "%s%s%s" % (BO, line[field], BE), 
       else:
         print FS, line[field],
     except:

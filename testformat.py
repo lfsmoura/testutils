@@ -64,7 +64,7 @@ def get_value(file, field):
       return "{0:.2f}".format(numpy.mean(map(float, values), axis=0)) + \
           '(%d)' % len(values)
   else:
-    return '-'
+    raise Exception("value not found")
 
 for line in fileinput.input('-'):
   # strips new line
@@ -96,6 +96,14 @@ if args.latex:
   BO = "{\\bf "
   BE = "}"
 
+'''
+output is in one of the following forms
+1)  field:value:label
+2)  field:value
+
+form 1 is labeled, and form 2 is shown by order of output
+'''
+
 # print headers
 if B_TABLE:
   print B_TABLE
@@ -114,22 +122,22 @@ for id in (range(maxlen) + labels.keys()):
 
   best = None
   for field in fields:
-    if label:
-      #print FS, 
-      line[field] = get_value(label, field)
+    if label: #ouput in the first form
       try:
+        line[field] = get_value(label, field)
         if args.max and (not best or float(line[field]) > best):
           best = float(line[field])
         elif args.min and (not best or float(line[field]) < best):
           best = float(line[field])
       except:
-        pass
-    else:
+        line[field] = NA
+    else: #output in the second form
       if field in unlabeled and len(unlabeled[field]) > id:
         line[field] = unlabeled[field][id]
       else:
         line[field] = NA
- 
+
+  # actually print values
   for field in fields:
     try:
       if best and float(line[field]) == best:

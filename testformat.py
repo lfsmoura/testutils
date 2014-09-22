@@ -54,7 +54,11 @@ def get_value(file, field):
     if len(values) == 1:
       return values[0]
     elif args.sum and field in args.sum:
-      return "{0:.2f}".format(sum(map(float, values)))
+      s = sum(map(float, values))
+      if s % 1 == 0:
+        return "%d" % int(s)
+      else:
+        return "{0:.2f}".format(s)
     elif args.mean and field in args.mean:
       return "{0:.2f}".format(numpy.mean(map(float, values), axis=0))
     elif args.meanstddev and field in args.meanstddev:

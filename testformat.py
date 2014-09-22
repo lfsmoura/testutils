@@ -77,7 +77,7 @@ for line in fileinput.input('-'):
   if len(fline) == 2:
     add_unlabeled_value(fline[0], fline[1])
   elif len(fline) == 3:
-    add_value(fline[2], fline[0], fline[1])
+    add_value(fline[2].strip(), fline[0].strip(), fline[1].strip())
 
 B_TABLE = None
 E_TABLE = None
